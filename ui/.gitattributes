@@ -1,0 +1,3 @@
+# avoid generating diffs config files
+/.yarn/releases/** binary
+/.yarn/plugins/** binary
