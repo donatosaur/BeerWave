@@ -1,4 +1,4 @@
-import { createTheme, Theme } from '@mui/material';
+import { createTheme, Theme, SxProps } from '@mui/material';
 import { indigo, purple } from '@mui/material/colors';
 
 export const siteTheme: Theme = createTheme({
@@ -22,3 +22,27 @@ export const siteTheme: Theme = createTheme({
   },
 
 });
+
+
+// declare default sx props for MUI elements ...
+
+const container: SxProps = {
+  p: 1,
+}
+
+const box: SxProps = {
+  p: 1,
+}
+
+const stepper: SxProps = {
+  p: 1,
+  alignItems: 'center',
+}
+
+
+// ... and make them efficiently accessible
+export const defaultSxProps = new Map<string, SxProps>([
+  ['container', container],
+  ['box', box],
+  ['stepper', stepper],
+]);

@@ -1,0 +1,73 @@
+{
+  "styles": [
+    "IPA",
+    "Stout",
+    "Ale",
+    "Lager",
+    "Porter",
+    "Saison",
+    "Wheat",
+    "Barley Wine",
+    "Pumpkin",
+    "Pilsner",
+    "Blonde Ale",
+    "Sour"
+  ],
+  "mappedFlavors": {
+      "cheese": ["cheese","cheddar","pecano","parmesean"],
+      "caramel": ["toffee", "caramel", "dulce"],
+      "salty": ["salt", "miso", "sodium chloride"],
+      "chocolate": ["chocolate", "cacao", "truffle"],
+      "coffee": ["coffee", "espresso"],
+      "spicy": ["spicy", "chilli", "sriracha"],
+      "tea": ["tea", "earl gray"],
+      "sweet": ["sweet", "cake"]
+    },
+  "individualFlavors": [
+    "sour",
+
+    "maple",
+    "honey",
+
+    "vanilla",
+    "cinnamon",
+    "ginger",
+    "rose",
+    "rosemary",
+
+    "pistachio",
+    "almond",
+    "pecan",
+    "hazelnut",
+    "walnut",
+    "peanut",
+
+    "apple",
+    "apricot",
+    "banana",
+    "blueberry",
+    "cherry",
+    "cranberry",
+    "currant",
+    "kiwi",
+    "lemon",
+    "lime",
+    "mango",
+    "orange",
+    "peach",
+    "pineapple",
+    "plum",
+    "pomegranite",
+    "raspberry",
+    "strawberry",
+
+    "carrot",
+    "pumpkin",
+    "rhubarb",
+
+    "garlic",
+    "herb",
+    "rye"
+
+  ]
+}
