@@ -11,6 +11,10 @@ interface SelectorProps {
   setSelectedOptions: Dispatch<string[]>;
 }
 
+/**
+ * An autocomplete-enabled selector component that allows up to the specified number of components to be
+ * selected, either by typing or by using a dropdown.
+ */
 export function Selector(props: SelectorProps): JSX.Element {
   const {
     id, 
@@ -34,6 +38,7 @@ export function Selector(props: SelectorProps): JSX.Element {
         getOptionDisabled = {       // prevent additional selections when the max number has been chosen
           () => selectedOptions.length >= maxSelections
         }
+        disableClearable             // the default location (next to the dropdown button) is a recipe for disaster
 
         // store the selected options
         value={selectedOptions}

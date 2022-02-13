@@ -12,10 +12,15 @@ export const siteTheme: Theme = createTheme({
     },
   },
   components: {
-    MuiContainer: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableTouchRipple: true,
+      }
+    },
+    MuiDialogTitle: {
       styleOverrides: {
         root: {
-          
+          alignSelf: 'center',
         }
       }
     }
@@ -34,15 +39,26 @@ const box: SxProps = {
   p: 1,
 }
 
-const stepper: SxProps = {
-  p: 1,
-  alignItems: 'center',
+const bordered: SxProps = {
+  border: 0,
+  borderRadius: 1,
+  boxShadow: 5,
+}
+
+
+
+const footer: SxProps = {
+  top: 'auto',  // anchor to bottom of flexbox
+  bottom: 0,
+  p: 2,
+  textAlign: 'center',
 }
 
 
 // ... and make them efficiently accessible
 export const defaultSxProps = new Map<string, SxProps>([
   ['container', container],
+  ['bordered', bordered],
   ['box', box],
-  ['stepper', stepper],
+  ['footer', footer],
 ]);

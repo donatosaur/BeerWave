@@ -9,7 +9,7 @@ import data from './data.json';
  * To obtain the actual search term,
  * 
  */
-export const flavorOptions: string[] = Object.keys(data.mappedFlavors).concat(data.individualFlavors);
+export const flavorOptions: string[] = Object.keys(data.mappedFlavors).concat(data.individualFlavors).sort();
 
 /**
  * Converts an array of flavor options to an array of flavor search terms.
@@ -29,4 +29,4 @@ export function getFlavorSearchTerms(flavors: string[]): string[] {
 /**
  * Style options to be presented to users for selection
  */
-export const styleOptions: string[] = data.styles;
+export const styleOptions: string[] = data.styles.sort();
