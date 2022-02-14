@@ -142,30 +142,31 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
     
     /**
      * The flavor portion of the match score needs fine tuning. For now, it's calculated like so:
-     *   - max num of matches <= 1 (yikes) gets 40 points for a match and 0 for no match
-     *   - anything above that, scales (stretched up to 5) between 40 and 80 for >= 1 match, and 0 for no match
+     *   - max num of matches <= 1 (yikes) gets 50 points for a match and 0 for no match
+     *   - anything above that, scales (stretched up to 5) between 50 and 80 for >= 1 match, and 0 for no match
      */
     if (numFlavorMatches > 0) {
       let scale;
       switch (maxMatchingFlavors) {
       case 2:
-        scale = 40;
+        scale = 50;
         break;
       case 3:
-        scale = 20;
+        scale = 15;
         break;
       case 4:
-        scale = 13;
-        pairing.matchScore += 1; // otherwise the spread is 39 instead of 40
+        scale = 10;
         break;
       default:
-        scale = 10;
+        scale = 7;
+        pairing.matchScore += 2; // otherwise the spread is 28 instead of 30
         break;
       }
       // if we get here, there's at least one match, so add 40 first, then multiple the scale by the balance
-      pairing.matchScore += 40 + scale * Math.max(4, (numFlavorMatches - 1));
+      pairing.matchScore += 50 + scale * Math.min(4, (numFlavorMatches - 1));
     }
   });
 
-  return pairings;
+  // sort the pairings in descending order by match score
+  return pairings.sort((first, second) => (second.matchScore - first.matchScore));
 }

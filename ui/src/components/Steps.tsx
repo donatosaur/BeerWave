@@ -13,8 +13,12 @@ import {
   Step,
   StepLabel,
   Typography,
+  InputLabel,
+  FormControl,
   Stack,
-  SxProps
+  Select,
+  MenuItem,
+  type SxProps
 } from '@mui/material';
 import { Selector } from '../components'
 import { defaultSxProps } from '../themes';
@@ -98,35 +102,62 @@ export function Steps({ setSearchTerms }: StepsProps): JSX.Element {
   const Step3 = (): JSX.Element => (
     <>
       <Box sx={defaultSxProps.get('box')}>
-        <Typography sx={stepTypographySxProp}>
-          Verify your selections.
+        <Typography variant= "h6" sx={stepTypographySxProp}>
+          <strong>(Optional)</strong> Select a maximum ABV:
         </Typography>
+        <FormControl sx={{minWidth: 200, pb: 4}}>
+          <InputLabel id='abv-limit'>ABV Limit (Optional)</InputLabel>
+          <Select
+            label='ABV Limit (Optional)'
+            labelId='abv-limit'
+            value={abvLimit}
+            onChange={(event) => setAbvLimit(Number.parseFloat(`${event.target.value}`) || 0)}
+          >
+            <MenuItem value={0}>unlimited</MenuItem>
+            <MenuItem value={4.0}>4.0 %</MenuItem>
+            <MenuItem value={5.0}>5.0 %</MenuItem>
+            <MenuItem value={6.0}>6.0 %</MenuItem>
+            <MenuItem value={7.0}>7.0 %</MenuItem>
+            <MenuItem value={8.0}>8.0 %</MenuItem>
+            <MenuItem value={9.0}>9.0 %</MenuItem>
+          </Select>
+        </FormControl>
 
-        <Typography>Styles:</Typography>
-        <Stack direction="row" spacing={2} sx={stepStackSxProp}>
-          {
-            selectedStyles.map((style) => (
-              <Chip
-                key={style}
-                label={style}
-                onDelete={() => setSelectedStyles(selectedStyles.filter((value) => style !== value))}
-              />
-            ))
-          }
-        </Stack>
+        <Box sx={{pb: 2}}>
+          <Typography variant= "h6" sx={stepTypographySxProp} paragraph>Verify your selections:</Typography>
 
-        <Typography>Flavors:</Typography>
-        <Stack direction="row" spacing={2} sx={stepStackSxProp}>
-          {
-            selectedFlavors.map((flavor) => (
-              <Chip
-                key={flavor}
-                label={flavor}
-                onDelete={() => setSelectedFlavors(selectedFlavors.filter((value) => flavor !== value))}
-              />
-            ))
-          }
-        </Stack>
+          <Stack direction="row" spacing={2} sx={stepStackSxProp}>
+            <Typography variant="body1" sx={{me: 1, pt: 1}} >Styles:</Typography>
+            {
+              selectedStyles.map((style) => (
+                <Chip
+                  key={style}
+                  label={style}
+                  onDelete={selectedStyles.length > 1
+                    ? () => setSelectedStyles(selectedStyles.filter((value) => style !== value))
+                    : undefined  // not passing a function removes the delete icon
+                  }
+                />
+              ))
+            }
+          </Stack>
+
+          <Stack direction="row" spacing={2} sx={stepStackSxProp}>
+            <Typography variant="body1" sx={{me: 1, pt: 1}}>Flavors:</Typography>
+            {
+              selectedFlavors.map((flavor) => (
+                <Chip
+                  key={flavor}
+                  label={flavor}
+                  onDelete={selectedFlavors.length > 1 
+                    ? () => setSelectedFlavors(selectedFlavors.filter((value) => flavor !== value))
+                    : undefined  // not passing a function removes the delete icon
+                  }
+                />
+              ))
+            }
+          </Stack>
+        </Box>
       </Box>
     </>
   );
@@ -186,7 +217,7 @@ export function Steps({ setSearchTerms }: StepsProps): JSX.Element {
     ],
     // Step 3 (Verify Selections)
     [
-      'Get a recipe',
+      'Get recommendation',
       selectedStyles.length === 0 || selectedFlavors.length === 0,
       <Step3 key='3' />
     ],  
