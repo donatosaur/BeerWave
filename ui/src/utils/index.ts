@@ -1,3 +1,3 @@
+export type { PairingJSON } from './types';
 export * from './optionsMapper';
-export * from './types';
-export * from './findRecipe';
+export * from './findMatches';

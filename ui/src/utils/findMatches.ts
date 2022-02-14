@@ -30,13 +30,21 @@ export async function findMatches(styles: string[], flavors: string[], abv: numb
 
   // examine the result of each query and store data; if we get multiple hits of the same result, we only want one
   const beers = new Map<number, BeerJSON>();
-  promises.forEach((promise) => {
+
+  /**
+   * We need to await an array of promises here to guarantee that the thread is blocked until each promise
+   * resolves and is processed. In order to block execution until each of the promises has resolved, we
+   * need to call Promise.all() on an array of promises.
+   * 
+   * For a really good explanation of this quirk: https://gist.github.com/joeytwiddle/37d2085425c049629b80956d3c618971
+   */
+  await Promise.all(promises.map(async (promise) => {
     if (promise.status === 'fulfilled' && promise.value.ok) {
       // check whether the API call itself was successful...
       const response = await promise.value.json();
       if (isPunkAPIErrorJSON(response)) {
         errorResponses.push(response.message);
-      // ... and whether 
+      // ... and whether it's actually a JSON array
       } else if (response instanceof Array) {
         response.forEach((potentialMatch) => {
           if (!!potentialMatch.id && !beers.has(potentialMatch.id)) {
@@ -56,12 +64,12 @@ export async function findMatches(styles: string[], flavors: string[], abv: numb
         });
       }
     }
-  });
+  }));
 
   // do we have at least one result to work with?
   if (beers.size === 0) {
     // todo: figure out what happened, return an error
-    return Promise.reject('Something terrible happened');
+    return Promise.reject('No beers found.');
   }
 
   // at this point, we've got pairing(s), so apply the heuristic
