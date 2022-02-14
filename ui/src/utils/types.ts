@@ -1,28 +1,51 @@
-export interface PairingJSON {
-  'id': number;
-  'name': string;
-  'tagline': string;
-  'description': string;
-  'abv': number;
-  'ibu': number;
-  'image_url': string;
-  'food_pairing': string[];
-  'brewers_tips': string;
-  'contributed_by': string;
-  'match_score': number;
-}
+/**
+ * Contains types used in ./utils
+ * 
+ * These are a mix of API response types from PunkAPI (see https://punkapi.com/documentation/v2)
+ * and of responses returned by the heuristic algorithm
+ */
 
+// ------------------------------------- API Error Response ------------------------------------- 
 
-interface PunkAPIErrorData {
-  'location'?: string;
-  'param'?: string;
-  'msg'?: string;
-  'value'?: string;
-}
-
+/** Error response format for PunkAPI calls */
 export interface PunkAPIErrorJSON {
-  'statusCode': number;
-  'error': string;
-  'message': string;
-  'data'?: PunkAPIErrorData[];
+  statusCode: number;
+  error: string;
+  message: string;
+  data?: {
+    location?: string;
+    param?: string;
+    msg?: string;
+    value?: string;
+  }[];
+}
+
+export function isPunkAPIErrorJSON (obj: any): obj is PunkAPIErrorJSON {
+  obj = obj as PunkAPIErrorJSON;
+  return !!obj.statusCode && !!obj.error && !!obj.message;
+}
+
+
+// ------------------------------------- API Data Response- ------------------------------------- 
+
+// Mixins to reduce code duplication
+export interface BeerJSON {
+  id: number;
+  name: string;
+  tagline: string;
+  description: string;
+  abv: number;
+  ibu: number | null;
+  imageURL: string;
+  foodPairing: string[];
+}
+
+/**
+ * Represents beer pairing data
+ */
+export interface PairingJSON extends BeerJSON {
+  matchingTerms: {
+    [key: string]: number
+  };
+  matchScore: number;
 }

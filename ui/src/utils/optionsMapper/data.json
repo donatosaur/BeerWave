@@ -14,7 +14,7 @@
     "Sour"
   ],
   "mappedFlavors": {
-      "Cheese": ["cheese","cheddar","pecano","parmesean"],
+      "Cheese": ["cheese","cheddar","parmesean"],
       "Caramel": ["toffee", "caramel", "dulce"],
       "Salty": ["salt", "miso", "sodium chloride"],
       "Chocolate": ["chocolate", "cacao", "truffle"],

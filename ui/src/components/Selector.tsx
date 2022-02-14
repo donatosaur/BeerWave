@@ -1,5 +1,5 @@
-import  { Autocomplete, TextField } from '@mui/material';
-import { Dispatch } from 'react';
+import type { Dispatch } from 'react';
+import { Autocomplete, TextField } from '@mui/material';
 
 interface SelectorProps {
   id: string;

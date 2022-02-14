@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, type Dispatch } from 'react';
 import {
   Box,
   Button,
@@ -22,6 +21,11 @@ import { defaultSxProps } from '../themes';
 import { styleOptions, flavorOptions, getFlavorSearchTerms } from '../utils';
 
 
+interface StepsProps {
+  setSearchTerms: Dispatch<any>;  // set to any for now to get MVP functioning
+}
+
+
 /**
  * Sx props for component-specific subcomponents.
  */
@@ -35,13 +39,13 @@ const selectorBoxSxProp: SxProps = { mt: 3, mb: 2 };
  * Step component for the main page. Guides users through the selection process before
  * making a recommendation.
  */
-export function Steps(): JSX.Element {
-  const navigate = useNavigate();
+export function Steps({ setSearchTerms }: StepsProps): JSX.Element {
 
   // Stepper States  
   const [current, setCurrent] = useState(0);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedFlavors, setSelectedFlavors] = useState<string[]>([]);
+  const [abvLimit, setAbvLimit] = useState(0);
 
   // Confirmation Modal States
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -240,7 +244,7 @@ export function Steps(): JSX.Element {
             disabled={getIsDisabled(current)}
             onClick={ () => (
               current === steps.length - 1
-                ? null  // todo; on complete
+                ? setSearchTerms({styles: selectedStyles, flavors: getFlavorSearchTerms(selectedFlavors), abvLimit})
                 : setCurrent(Math.min(steps.length - 1, current + 1))
             )}>
             { current === steps.length - 1 ? 'Complete' : 'Next' }

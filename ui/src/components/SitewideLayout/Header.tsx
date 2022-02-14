@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as ReactRouterLink } from 'react-router-dom';
 import { AppBar, Box, Container, Typography, Link } from '@mui/material';
 
 /**

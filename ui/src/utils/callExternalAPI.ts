@@ -1,13 +1,18 @@
-import { PunkAPIErrorJSON } from './types';
+import type { PunkAPIErrorJSON } from './types';
 
 const BEER_API_URL = 'https://api.punkapi.com/v2/beers'
+
+/**
+ * Promise resolving to an array of settled promises
+ */
+type PromiseArray = Promise<PromiseSettledResult<Response>[]>;
 
 /**
  * Gets a specific beer object based on its ID
  * 
  * @param id the id of the beer to retrieve
  */
-export async function getByID(id: number): Promise<object> {
+export async function getByID(id: Array<number | string>): Promise<object> {
   // make a request for the beer object with the specified id
   const response = await fetch(`${BEER_API_URL}/${id}`);
   if (!response.ok) {
@@ -20,35 +25,39 @@ export async function getByID(id: number): Promise<object> {
 }
 
 /**
- * Gets an array of beer objects based on fuzzy search terms.
+ * Gets an array of beer objects based on a fuzzy search including the following terms:
  * 
- * Queries the external punkapi database for:
- *   - flavors mentioned in food pairings
- *   - styles mentioned in names
- *   - 
-//  */
-// export async function getByFuzzySearch(abv: number): Promise<object> {
-//   // make a request with some fuzzy search terms
-//   return Promise(false);
-//   /**
-//    * It's a bit awkward, but spices are located in 'hops' in the external database, so we can search
-//    * for flavors there too. The PunkAPI documentation indicates the following types/descriptions for
-//    * what we're searching on:
-//    * 
-//    * 
-//    */
+ * The external API is limited to 3600 requests/hr.
+ * There are a maximum of 5 values among styles, which results in a maximum of 5 requests.
+ * There are a maximum of 5 values among flavors, but at worst that's 3 * 5 = 15 actual flavors (some map to 3).
+ * 
+ * At best:  3600 req/hr * 1 search /  2 req = 1800 searches/hr
+ * At worst: 3600 req/hr * 1 search / 15 req =  240 searches/hr
+ * 
+ * @param styles an array of strings representing beer styles
+ * @param flavors an array of strings representing flavors
+ * @param abv the maximum ABV to search for (0 for no limit)
+ */
+export async function getByFuzzySearch(styles: string[], flavors: string[], abv: number = 0): PromiseArray {
+  // build a list of query strings
+  const queryStrings: string[] = [];
+  styles.map((style) => queryStrings.push(`beer_name=${style}`));
+  flavors.map((flavor) => queryStrings.push(`food=${flavor}`));
 
-//   /**
-//    * abv_lt
-//    * ibu_lt
-//    * ibu_gt
-//    * 
-//    * beer_name  (partial match)
-//    * 
-//    * food -->
-//    * 
-//    */
+  // run a fetch query for all of them...
+  const responses = queryStrings.map((queryString) => {
+    const url = abv > 0
+      ? `${BEER_API_URL}?abv_lt=${abv + 0.01}&${queryString}`
+      : `${BEER_API_URL}?${queryString}`
 
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  });
 
-
-// }
+  // ... and return them, whether or not they're successful
+  return Promise.allSettled(responses);
+}

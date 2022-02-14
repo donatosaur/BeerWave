@@ -1,4 +1,5 @@
-import { createTheme, Theme, SxProps } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+import { createTheme } from '@mui/material';
 import { indigo, purple } from '@mui/material/colors';
 
 export const siteTheme: Theme = createTheme({
