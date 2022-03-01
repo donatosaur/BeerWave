@@ -26,7 +26,7 @@ export function isPunkAPIErrorJSON (obj: any): obj is PunkAPIErrorJSON {
 }
 
 
-// ------------------------------------- API Data Response- ------------------------------------- 
+// ------------------------------------- API Data Response -------------------------------------- 
 
 // Mixins to reduce code duplication
 export interface BeerJSON {
@@ -48,4 +48,30 @@ export interface PairingJSON extends BeerJSON {
     [key: string]: number
   };
   matchScore: number;
+}
+
+/**
+ * Represents plot values as key-value JSON objects
+ */
+export interface PlotValues {
+  label: string;
+  value: number;
+}
+
+/**
+ * Represents request data sent to Plot microservice
+ */ 
+export interface PlotJSON {
+  title: string;
+  x_label: string;
+  y_label: string;
+  type: 'bar' | 'pie';
+  values: PlotValues[];
+}
+
+
+export interface MatchData {
+  styleSummaryData: PlotValues[];
+  flavorSummaryData: PlotValues[];
+  pairings: PairingJSON[];
 }

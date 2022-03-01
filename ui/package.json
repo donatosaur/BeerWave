@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "author": "Donato Quartuccia",
   "private": true,
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
@@ -45,6 +46,7 @@
     "@typescript-eslint/parser": "^5.10.2",
     "eslint": "^8.8.0",
     "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0"
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "serve": "^13.0.2"
   }
 }

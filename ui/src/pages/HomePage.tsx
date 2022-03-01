@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import { Steps, HelpButton } from '../components';
 import { defaultSxProps } from '../themes';
-import { findMatches, type PairingJSON } from '../utils';
+import { findMatches, type PairingJSON, type PlotValues } from '../utils';
 import ResultsPage from './ResultsPage';
 
 type searchTermsObject = {styles: string[], flavors: string[], abvLimit: number} | null;
@@ -10,6 +10,9 @@ type searchTermsObject = {styles: string[], flavors: string[], abvLimit: number}
 export function HomePage(): JSX.Element {
   const [searchTerms, setSearchTerms] = useState<searchTermsObject | null>(null);
   const [results, setResults] = useState<PairingJSON[]>([]);
+  const [styleData, setStyleData] = useState<PlotValues[]>([]);
+  const [flavorData, setFlavorData] = useState<PlotValues[]>([]);
+
 
   useEffect(() => {
     if (searchTerms === null) {
@@ -21,7 +24,9 @@ export function HomePage(): JSX.Element {
       try {
         const {styles, flavors, abvLimit} = searchTerms;
         const results = await findMatches(styles, flavors, abvLimit);
-        setResults(results);
+        setResults(results.pairings);
+        setStyleData(results.styleSummaryData);
+        setFlavorData(results.flavorSummaryData);
       } catch (error) {
         console.error(`Something went wrong: ${error}`);
       }
@@ -30,11 +35,16 @@ export function HomePage(): JSX.Element {
   }, [searchTerms]);
 
   const helpText = [
-    'To use this app, first select one to five styles of beer. You may either begin typing or use the dropdown ' +
-    'button on the right. If you make a mistake, click the X button to remove an option.',
-    'When you\'re ready, press Next to continue to the next step. If you change your mind, use the Back button.',
-    'Finally, you may select a maximum ABV (totally optional), verify your choices, and press Complete to get' +
-    'a recommendation! If you don\'t like your choices, you may click Start Over!',
+    'To use this app:',
+    '(1) Select at least one style of beer. You may either begin typing or use the dropdown button on the right. ' +
+    'If you add an option by mistake, click the X button to remove it.',
+    '(2) When you\'re ready, press Next to continue.',
+    '(3) Select at least one flavor in the same way you selected one at least one style. If at any point you want ' +
+    'to go back to the previous step, just press Back.',
+    '(4) When you\'re ready, press Next to continue.',
+    '(5) Optionally choose a maximum ABV from the dropdown box, verify your choices, and press Complete to receive ' +
+    'a recommendation!',
+    'Note: if you don\'t like your choices, you can click Start Over instead to begin the process from scratch.'
   ]
 
   return (
@@ -73,10 +83,14 @@ export function HomePage(): JSX.Element {
       { results.length > 0 && (
         <Box>
           <ResultsPage
-            results={results} 
+            results={results}
+            styleData={styleData}
+            flavorData={flavorData}
             restart={() => {
               setSearchTerms(null);
               setResults([]);
+              setStyleData([]);
+              setFlavorData([]);
             }}
           />
         </Box>

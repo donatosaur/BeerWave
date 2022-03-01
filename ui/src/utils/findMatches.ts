@@ -1,4 +1,4 @@
-import { type PairingJSON, type BeerJSON, isPunkAPIErrorJSON } from './types';
+import { type PairingJSON, type BeerJSON, type MatchData, isPunkAPIErrorJSON } from './types';
 import * as callExternalAPI from './callExternalAPI';
 
 type matchingTermsType = {[key: string]: number};
@@ -10,7 +10,7 @@ type matchingTermsType = {[key: string]: number};
  * @param flavors an array of strings representing flavors
  * @param abv the maximum ABV to search for (0 for no limit)
  */
-export async function findMatches(styles: string[], flavors: string[], abv: number = 0): Promise<PairingJSON[]> {
+export async function findMatches(styles: string[], flavors: string[], abv: number = 0): Promise<MatchData> {
   /**
    * The API will return a whole bunch of information in a JSON array, most of which we're not
    * actually interested in. What we are interested in is the following:
@@ -86,7 +86,7 @@ export async function findMatches(styles: string[], flavors: string[], abv: numb
  *  - 80% - matching flavors
  * 
  */
-function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, BeerJSON>): PairingJSON[] {
+function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, BeerJSON>): MatchData {
   /**
    * For convenience, we can store the data we need to weight the heuristic in a map. We'll need to store:
    *   - whether the beer had a style match (boolean)
@@ -94,8 +94,16 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
    * 
    * key: beer id; value: [matchedStyle?, numFlavorMatches]
    */
-  const beerInfo = new Map<number, [boolean, number]>()
+  const beerInfo = new Map<number, [boolean, number]>();
   let maxMatchingFlavors = 0;  // we can use this to adjust the weights later
+
+  /**
+   * We also need to store the total matches for each search term so that we can return that data as well
+   * 
+   * key: search term; value: 
+   */
+  const styleSummary = new Map<string, number>();
+  const flavorSummary = new Map<string, number>();
 
   // first pass: determine and store the number of matching styles and flavors
   const pairings: PairingJSON[] = [];
@@ -109,8 +117,17 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
     styles.forEach((style) => {
       // styles are matched against names
       const searchTerm = new RegExp(style, 'gi');  // construct a regex that is global (/g) and case-insensitive (/i)
-      matchingTerms[style] = beer.name?.match(searchTerm)?.length ?? 0;
-      matchedStyle = true;
+
+      // check whether the style is found in the beer's name
+      if (searchTerm.test(beer?.name ?? '')) {
+        matchingTerms[style] = 1;  // for now, this can only be 1 since we're just searching the name
+        matchedStyle = true;       // we matched at least one style on this beer
+
+        // keep track of summary data
+        styleSummary.set(style, (styleSummary.get(style) ?? 0) + 1);
+      } else {
+        matchingTerms[style] = 0;
+      }
     });
     flavors.forEach((flavor) => {
       // flavors are matched against food pairings; pairings is an array of strings: first we need
@@ -119,18 +136,23 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
       const matchArray = beer.foodPairing.map((pairing) => pairing?.match(searchTerm)?.length ?? 0);
       matchingTerms[flavor] = matchArray.reduce((prev, curr) => prev + curr);
       numMatchingFlavors += matchingTerms[flavor];
+
+      // keep track of summary data
+      if (matchingTerms[flavor] > 0) {
+        flavorSummary.set(flavor, (styleSummary.get(flavor) ?? 0) + matchingTerms[flavor]);
+      }
     });
 
     // set the info and keep track of the max matches
     beerInfo.set(beer.id, [matchedStyle, numMatchingFlavors])
     maxMatchingFlavors = Math.max(maxMatchingFlavors, numMatchingFlavors);
 
+    // reconstruct the pairing object and store it
     const pairing: PairingJSON = {
       ...beer,
       matchingTerms,
       matchScore: 0,  // intiialized to 0, we'll calculate this later
     };
-
     pairings.push(pairing);
   });
 
@@ -149,24 +171,30 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
       let scale;
       switch (maxMatchingFlavors) {
       case 2:
-        scale = 50;
+        scale = 25;
         break;
       case 3:
-        scale = 15;
-        break;
-      case 4:
         scale = 10;
         break;
+      // case 4:
+      //   scale = 10;
+      //   break;
       default:
         scale = 7;
         pairing.matchScore += 2; // otherwise the spread is 28 instead of 30
         break;
       }
-      // if we get here, there's at least one match, so add 40 first, then multiple the scale by the balance
+      // if we get here, there's at least one match, so add 50 first, then multiply the scale by the balance
       pairing.matchScore += 50 + scale * Math.min(4, (numFlavorMatches - 1));
     }
   });
 
-  // sort the pairings in descending order by match score
-  return pairings.sort((first, second) => (second.matchScore - first.matchScore));
+  console.log(flavorSummary);
+
+  // sort the pairings in descending order by match score & get the summary data in the right format
+  return { 
+    styleSummaryData: Array.from(styleSummary.entries()).map(([label, value]) => ({label, value})),
+    flavorSummaryData: Array.from(flavorSummary.entries()).map(([label, value]) => ({label, value})), 
+    pairings: pairings.sort((first, second) => (second.matchScore - first.matchScore)),
+  };
 }

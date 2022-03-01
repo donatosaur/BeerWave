@@ -1,6 +1,9 @@
-import type { PunkAPIErrorJSON } from './types';
+import type { PunkAPIErrorJSON, PlotJSON, PlotValues } from './types';
 
-const BEER_API_URL = 'https://api.punkapi.com/v2/beers'
+const BEER_API_URL = 'https://api.punkapi.com/v2/beers';
+// const PLOT_API_URL = '/api/plot';
+const PLOT_API_URL = 'http://localhost:8000/api/plot';
+
 
 /**
  * Promise resolving to an array of settled promises
@@ -60,4 +63,43 @@ export async function getByFuzzySearch(styles: string[], flavors: string[], abv:
 
   // ... and return them, whether or not they're successful
   return Promise.allSettled(responses);
+}
+
+
+/**
+ * Gets an chart image (as a Blob) from the Plot API Microservice
+ * 
+ * @param title a title for the chart
+ * @param type 'bar' for a bar chart, 'pie' for a pie chart
+ * @param values an array of objects containing label-value pair objects
+ * @param x_label a label for the x-axis (for type 'bar')
+ * @param y_label a label for the y-axis (for type 'bar')
+ * 
+ */
+export async function getPlot(
+  title: string,
+  type: 'bar' | 'pie',
+  values: PlotValues[],
+  x_label: string = '',
+  y_label: string = '',
+): Promise<Blob> {
+
+  // send the request
+  const plotRequest: PlotJSON = { title, x_label, y_label, type, values }
+  const response = await fetch(PLOT_API_URL, {
+    method: 'POST',
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(plotRequest),
+  });
+
+  // parse it
+  if (!response.ok || !response.headers?.get('Content-Type')?.startsWith('image/')) {
+    return Promise.reject(new Error('getPlot() fetch call failed'));
+  }
+
+  // return the binary image data
+  return response.blob();
 }

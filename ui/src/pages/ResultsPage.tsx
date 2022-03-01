@@ -1,11 +1,12 @@
-import { useState, useEffect, type Dispatch } from 'react';
+import { useState, type Dispatch } from 'react';
 import { Box, Container, Grid, Stack, Typography, Button, IconButton } from '@mui/material';
 import { Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import { Card, CardHeader, CardActions, CardContent, CardMedia } from '@mui/material';
 // import { Table, TableHead, TableBody, TableRow, TableCell, TableContainer } from '@mui/material';
-import { ChevronLeft, ChevronRight, Twitter, Bookmark } from '@mui/icons-material'
-import type { PairingJSON } from '../utils';
-import { HelpButton } from '../components';
+import { ChevronLeft, ChevronRight, Twitter, NorthEast } from '@mui/icons-material'
+import type { PairingJSON, PlotValues } from '../utils';
+import { HelpButton, ChartImageCardMedia } from '../components';
+
 
 // interface ResultsListProps {
 //   results: PairingJSON[];
@@ -47,9 +48,12 @@ interface BeerCardProps {
   onBackButtonClick: () => void;
   onNextButtonClick: () => void;
   setDialogOpen: Dispatch<boolean>;
+  flavorData: PlotValues[];  //todo; temp
 }
 
 function BeerCard(props: BeerCardProps): JSX.Element {
+  const [chartOpen, setChartOpen] = useState(false);
+  
   const {
     beer,
     backButtonDisabled,
@@ -57,6 +61,7 @@ function BeerCard(props: BeerCardProps): JSX.Element {
     onBackButtonClick,
     onNextButtonClick,
     setDialogOpen,
+    flavorData, // todo; temp
   } = props;
 
   const CardNavigation = (): JSX.Element => (
@@ -78,6 +83,30 @@ function BeerCard(props: BeerCardProps): JSX.Element {
         </IconButton>
       </Box>
     </CardContent>
+  );
+
+  // Temporary; this is for integration
+  const ChartDialog = (): JSX.Element => (
+    <Dialog maxWidth="md" open={chartOpen} onClose={() => setChartOpen(false)}>
+      <DialogTitle>Summary</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          <Card variant="outlined" sx={{width: 500, height: 400}}>
+            <ChartImageCardMedia 
+              title="Flavor Matches Among All Beers Searched"
+              values={flavorData}
+              width="500"
+              height="400"
+            />
+          </Card>
+        </DialogContentText>
+        <DialogActions>
+          <Button variant="text" onClick={() => setChartOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
+      </DialogContent>
+    </Dialog>
   );
 
   const helpText = [
@@ -121,8 +150,19 @@ function BeerCard(props: BeerCardProps): JSX.Element {
         />
       </>
 
+      {chartOpen && <ChartDialog />}
+
+
       {/* Share/Save Panel */}
       <CardActions sx={{flex: 1, justifyContent: 'flex-end'}}>
+        <Button
+          variant="contained"
+          endIcon={<NorthEast />}
+          onClick={() => setChartOpen(true)}
+        >
+          See Summary of Matches
+        </Button>
+
         {/* <Button
           variant="contained"
           endIcon={<Bookmark />}
@@ -163,10 +203,12 @@ function BeerCard(props: BeerCardProps): JSX.Element {
 
 interface ResultsPageProps {
   restart: () => void;
+  styleData: PlotValues[];
+  flavorData: PlotValues[];
   results: PairingJSON[];
 }
 
-export default function ResultsPage({ results, restart }: ResultsPageProps): JSX.Element {
+export default function ResultsPage({ results, styleData, flavorData, restart }: ResultsPageProps): JSX.Element {
   const [resultIndex, setResultIndex] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -192,7 +234,6 @@ export default function ResultsPage({ results, restart }: ResultsPageProps): JSX
     </Dialog>
   );
 
-
   return (
     <>
       { dialogOpen && <StartOverDialog />}
@@ -206,9 +247,10 @@ export default function ResultsPage({ results, restart }: ResultsPageProps): JSX
           </Grid>
 
           {/* Result */}
-          <Grid item xs={8} sx={{alignSelf: 'right'}}>
+          <Grid item xs={12} sx={{alignSelf: 'right'}}>
             <BeerCard 
-              beer={results[resultIndex]} 
+              beer={results[resultIndex]}
+              flavorData={flavorData}  //todo; temp
               backButtonDisabled={resultIndex === 0}
               nextButtonDisabled={resultIndex === results.length - 1}
               onBackButtonClick={() => setResultIndex(Math.max(resultIndex - 1, 0))}
@@ -218,7 +260,7 @@ export default function ResultsPage({ results, restart }: ResultsPageProps): JSX
           </Grid>
 
           {/* Info Panel */}
-          <Grid item xs={4}>
+          {/* <Grid item xs={4}>
             <Stack>
               <Card variant="outlined" sx={{width: 150, height: 150}}>
                 <CardMedia
@@ -230,18 +272,29 @@ export default function ResultsPage({ results, restart }: ResultsPageProps): JSX
                   loading="lazy"
                 />
               </Card>
-              <Card variant="outlined" sx={{width: 150, height: 150}}>
-                <CardMedia
-                  component="img"
-                  width="100"
-                  height="100"
-                  image=""
-                  alt={`Placeholder for graph from ethan's service. ${JSON.stringify(results[resultIndex].matchingTerms)}`}
-                  loading="lazy"
+              <Box sx={{pt: 5, width: 200, height: 150}}>
+                <Button variant="outlined">
+                  Display a summary of matches
+                </Button>
+              </Box>
+              <Card variant="outlined" sx={{width: 200, height: 200}}>
+                <ChartImageCardMedia 
+                  title="Style Matches Among All Beers Searched"
+                  values={styleData}
+                  width="200"
+                  height="200"
+                />
+              </Card>
+              <Card variant="outlined" sx={{width: 400, height: 400}}>
+                <ChartImageCardMedia 
+                  title="Flavor Matches Among All Beers Searched"
+                  values={flavorData}
+                  width="400"
+                  height="400"
                 />
               </Card>
             </Stack>
-          </Grid>
+          </Grid> */}
 
         </Grid>
       </Container>
