@@ -1,5 +1,5 @@
 /**
- * Contains types used in ./utils
+ * Contains types used in /utils
  * 
  * These are a mix of API response types from PunkAPI (see https://punkapi.com/documentation/v2)
  * and of responses returned by the heuristic algorithm
@@ -28,7 +28,7 @@ export function isPunkAPIErrorJSON (obj: any): obj is PunkAPIErrorJSON {
 
 // ------------------------------------- API Data Response -------------------------------------- 
 
-// Mixins to reduce code duplication
+/** Mixin */
 export interface BeerJSON {
   id: number;
   name: string;
@@ -40,9 +40,7 @@ export interface BeerJSON {
   foodPairing: string[];
 }
 
-/**
- * Represents beer pairing data
- */
+/** Represents beer pairing data */
 export interface PairingJSON extends BeerJSON {
   matchingTerms: {
     [key: string]: number
@@ -50,17 +48,13 @@ export interface PairingJSON extends BeerJSON {
   matchScore: number;
 }
 
-/**
- * Represents plot values as key-value JSON objects
- */
+/** Represents plot values as key-value JSON objects */
 export interface PlotValues {
   label: string;
   value: number;
 }
 
-/**
- * Represents request data sent to Plot microservice
- */ 
+/** Represents request data sent to Plot microservice */ 
 export interface PlotJSON {
   title: string;
   x_label: string;
@@ -68,7 +62,6 @@ export interface PlotJSON {
   type: 'bar' | 'pie';
   values: PlotValues[];
 }
-
 
 export interface MatchData {
   styleSummaryData: PlotValues[];

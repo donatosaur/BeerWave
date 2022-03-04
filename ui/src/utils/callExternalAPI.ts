@@ -1,7 +1,6 @@
 import type { PunkAPIErrorJSON, PlotJSON, PlotValues } from './types';
 
 const BEER_API_URL = 'https://api.punkapi.com/v2/beers';
-// const PLOT_API_URL = '/api/plot';
 const PLOT_API_URL = 'http://localhost:8000/api/plot';
 
 
@@ -16,13 +15,12 @@ type PromiseArray = Promise<PromiseSettledResult<Response>[]>;
  * @param id the id of the beer to retrieve
  */
 export async function getByID(id: Array<number | string>): Promise<object> {
-  // make a request for the beer object with the specified id
   const response = await fetch(`${BEER_API_URL}/${id}`);
   if (!response.ok) {
     return await response.json() as PunkAPIErrorJSON;
   }
 
-  // if the request was successful, parse and return it; it should be a JSON array of exactly one object
+  // successful requests should resolve to a JSON array of exactly one object
   const parsed_response = response.json();
   return parsed_response instanceof Array ? parsed_response[0] : parsed_response;
 }
@@ -47,7 +45,7 @@ export async function getByFuzzySearch(styles: string[], flavors: string[], abv:
   styles.map((style) => queryStrings.push(`beer_name=${style}`));
   flavors.map((flavor) => queryStrings.push(`food=${flavor}`));
 
-  // run a fetch query for all of them...
+  // run and return a query for each, whether or not they're successful
   const responses = queryStrings.map((queryString) => {
     const url = abv > 0
       ? `${BEER_API_URL}?abv_lt=${abv + 0.01}&${queryString}`
@@ -61,7 +59,6 @@ export async function getByFuzzySearch(styles: string[], flavors: string[], abv:
     });
   });
 
-  // ... and return them, whether or not they're successful
   return Promise.allSettled(responses);
 }
 
@@ -84,7 +81,6 @@ export async function getPlot(
   y_label: string = '',
 ): Promise<Blob> {
 
-  // send the request
   const plotRequest: PlotJSON = { title, x_label, y_label, type, values }
   const response = await fetch(PLOT_API_URL, {
     method: 'POST',
@@ -95,11 +91,10 @@ export async function getPlot(
     body: JSON.stringify(plotRequest),
   });
 
-  // parse it
+  // parse and verify that we received an image
   if (!response.ok || !response.headers?.get('Content-Type')?.startsWith('image/')) {
     return Promise.reject(new Error('getPlot() fetch call failed'));
   }
 
-  // return the binary image data
   return response.blob();
 }

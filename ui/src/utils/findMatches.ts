@@ -1,10 +1,15 @@
-import { type PairingJSON, type BeerJSON, type MatchData, isPunkAPIErrorJSON } from './types';
 import * as callExternalAPI from './callExternalAPI';
+import { 
+  type PairingJSON,
+  type BeerJSON,
+  type MatchData,
+  type PlotValues,
+  isPunkAPIErrorJSON
+} from './types';
 
-type matchingTermsType = {[key: string]: number};
 
 /**
- * Gets an array of beer objects based on a fuzzy search including the passed terms, with a heuristic applied.
+ * Gets an array of beer objects based on a fuzzy search including the passed terms, with a heuristic applied
  * 
  * @param styles an array of strings representing beer styles
  * @param flavors an array of strings representing flavors
@@ -12,43 +17,25 @@ type matchingTermsType = {[key: string]: number};
  */
 export async function findMatches(styles: string[], flavors: string[], abv: number = 0): Promise<MatchData> {
   /**
-   * The API will return a whole bunch of information in a JSON array, most of which we're not
-   * actually interested in. What we are interested in is the following:
-   *  1. Identifying information for the beer that we can search and/or display:
-   *     id, name, tagline, description, abv, ibu, image_url, food_pairings
-   * 
-   *  2. Anything else that we could search:
-   *     brewers_tips, ingredients?.hops?.name
-   * 
-   *  Also, we may receive duplicate results, so we can use the returned ids to filter those out.
+   * The API returns information we're not interested in, so we need to filter it. All we want is any identifying info
+   * to be searched through or display which are contained in {@link BeerJSON}, while avoiding duplicate beer results
    */
-  // make the queries
   const promises = await callExternalAPI.getByFuzzySearch(styles, flavors, abv);
-
-  // hold onto any rejected responses; if we get nothing but errors, we can search this for a reason
   const errorResponses: string[] = [];
-
-  // examine the result of each query and store data; if we get multiple hits of the same result, we only want one
   const beers = new Map<number, BeerJSON>();
 
-  /**
-   * We need to await an array of promises here to guarantee that the thread is blocked until each promise
-   * resolves and is processed. In order to block execution until each of the promises has resolved, we
-   * need to call Promise.all() on an array of promises.
-   * 
-   * For a really good explanation of this quirk: https://gist.github.com/joeytwiddle/37d2085425c049629b80956d3c618971
-   */
+  // await an array to guarantee blocking (see https://gist.github.com/joeytwiddle/37d2085425c049629b80956d3c618971)
   await Promise.all(promises.map(async (promise) => {
     if (promise.status === 'fulfilled' && promise.value.ok) {
-      // check whether the API call itself was successful...
       const response = await promise.value.json();
+
+      // check whether the API call itself was successful...
       if (isPunkAPIErrorJSON(response)) {
         errorResponses.push(response.message);
       // ... and whether it's actually a JSON array
       } else if (response instanceof Array) {
         response.forEach((potentialMatch) => {
           if (!!potentialMatch.id && !beers.has(potentialMatch.id)) {
-            // grab the relevant information from the potential match and store it
             const beer: BeerJSON = {
               id: potentialMatch.id,
               name: potentialMatch.name,
@@ -66,95 +53,62 @@ export async function findMatches(styles: string[], flavors: string[], abv: numb
     }
   }));
 
-  // do we have at least one result to work with?
-  if (beers.size === 0) {
-    // todo: figure out what happened, return an error
-    return Promise.reject('No beers found.');
-  }
-
-  // at this point, we've got pairing(s), so apply the heuristic
-  return applyHeuristic(styles, flavors, beers);
+  return beers.size > 0 ? applyHeuristic(styles, flavors, beers) : Promise.reject(new Error(errorResponses[0]));
 }
 
+
+
+
 /**
- * Supplies an array of PairingJSON objects, sorted in decreasing order of match score. The heuristic
- * applied is intended to weigh beers with a style match above equivalent beers with no style match,
- * and likewise beers with more matching flavors above those with less.
+ * Applies a heuristic to score matches from 1 to 100 weighted 20% for matching style and 80% for matching flavors
  * 
- * The heuristic is on a scale from 1 to 100 and simply weighted as follows:
- *  - 20% - matching style
- *  - 80% - matching flavors
- * 
+ * @return PairingJSON objects sorted in decreasing order and summary data for search term matches found
  */
 function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, BeerJSON>): MatchData {
-  /**
-   * For convenience, we can store the data we need to weight the heuristic in a map. We'll need to store:
-   *   - whether the beer had a style match (boolean)
-   *   - how many of the flavors were found in the food pairings array (number)
-   * 
-   * key: beer id; value: [matchedStyle?, numFlavorMatches]
-   */
-  const beerInfo = new Map<number, [boolean, number]>();
-  let maxMatchingFlavors = 0;  // we can use this to adjust the weights later
-
-  /**
-   * We also need to store the total matches for each search term so that we can return that data as well
-   * 
-   * key: search term; value: 
-   */
-  const styleSummary = new Map<string, number>();
-  const flavorSummary = new Map<string, number>();
-
-  // first pass: determine and store the number of matching styles and flavors
+  let maxMatchingFlavors = 0;                             // to adjust weights
+  const beerInfo = new Map<number, [boolean, number]>();  // beerID -> matched style, num matching flavors
+  const styleSummary = new Map<string, number>();         // style -> num matching beers
+  const flavorSummary = new Map<string, number>();        // flavors -> num matching beers
   const pairings: PairingJSON[] = [];
+
+  /**
+   * First Pass: Determine and store the number of matching styles and flavors, respectively
+   */
   beers.forEach((beer) => {
-    // initialize values for beerInfo
+    const pairing: PairingJSON = { ...beer, matchingTerms: {}, matchScore: 0 };
+    beerInfo.set(beer.id, [false, 0]);
+
+    // match styles
     let matchedStyle = false;
-    let numMatchingFlavors = 0;
-
-    // destructure the object so we can rebuild it into a pairingJSON object later
-    const matchingTerms: matchingTermsType = {};
     styles.forEach((style) => {
-      // styles are matched against names
-      const searchTerm = new RegExp(style, 'gi');  // construct a regex that is global (/g) and case-insensitive (/i)
-
-      // check whether the style is found in the beer's name
-      if (searchTerm.test(beer?.name ?? '')) {
-        matchingTerms[style] = 1;  // for now, this can only be 1 since we're just searching the name
-        matchedStyle = true;       // we matched at least one style on this beer
-
-        // keep track of summary data
-        styleSummary.set(style, (styleSummary.get(style) ?? 0) + 1);
-      } else {
-        matchingTerms[style] = 0;
+      pairing.matchingTerms[style] = Math.max(findNumMatches(style, beer?.name ?? ''), 1); // capped for now
+      if (pairing.matchingTerms[style] > 0) {
+        styleSummary.set(style, (styleSummary.get(style) ?? 0) + 1);  // keep track of summary data
+        matchedStyle = true;                                          // we found at least one match
       }
     });
+
+    // match flavors
+    let numMatchingFlavors = 0;
     flavors.forEach((flavor) => {
-      // flavors are matched against food pairings; pairings is an array of strings: first we need
-      // to get the number of matches in each substring, then we can sum them (using reduce)
-      const searchTerm = new RegExp(flavor, 'gi');
-      const matchArray = beer.foodPairing.map((pairing) => pairing?.match(searchTerm)?.length ?? 0);
-      matchingTerms[flavor] = matchArray.reduce((prev, curr) => prev + curr);
-      numMatchingFlavors += matchingTerms[flavor];
+      pairing.matchingTerms[flavor] = findNumMatches(flavor, beer?.foodPairing ?? '');
+      numMatchingFlavors += pairing.matchingTerms[flavor];
 
       // keep track of summary data
-      if (matchingTerms[flavor] > 0) {
-        flavorSummary.set(flavor, (styleSummary.get(flavor) ?? 0) + matchingTerms[flavor]);
+      if (pairing.matchingTerms[flavor] > 0) {
+        flavorSummary.set(flavor, (styleSummary.get(flavor) ?? 0) + pairing.matchingTerms[flavor]);
       }
     });
 
-    // set the info and keep track of the max matches
-    beerInfo.set(beer.id, [matchedStyle, numMatchingFlavors])
     maxMatchingFlavors = Math.max(maxMatchingFlavors, numMatchingFlavors);
-
-    // reconstruct the pairing object and store it
-    const pairing: PairingJSON = {
-      ...beer,
-      matchingTerms,
-      matchScore: 0,  // intiialized to 0, we'll calculate this later
-    };
+    beerInfo.set(beer.id, [matchedStyle, numMatchingFlavors])
     pairings.push(pairing);
   });
+
+
+  /**
+   * Second pass: determine the match score for each beer
+   */
 
   // second pass: determine the match score for each beer
   pairings.forEach((pairing) => {
@@ -189,12 +143,32 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
     }
   });
 
-  console.log(flavorSummary);
-
   // sort the pairings in descending order by match score & get the summary data in the right format
   return { 
-    styleSummaryData: Array.from(styleSummary.entries()).map(([label, value]) => ({label, value})),
-    flavorSummaryData: Array.from(flavorSummary.entries()).map(([label, value]) => ({label, value})), 
+    styleSummaryData: summaryMapToArray(styleSummary),
+    flavorSummaryData: summaryMapToArray(flavorSummary), 
     pairings: pairings.sort((first, second) => (second.matchScore - first.matchScore)),
   };
+}
+
+
+/** -------------------------------------------------- Helpers -------------------------------------------------- */
+
+/**
+ * Converts summary data from Map to a PlotValues array
+ */
+function summaryMapToArray(summaryMap: Map<string, number>): PlotValues[] {
+  return Array.from(summaryMap.entries()).map(([label, value]) => ({label, value}));
+}
+
+/**
+ * Finds the number of times term appears in searchSpace
+ */
+function findNumMatches(term: string, searchSpace: string | string[]): number {
+  const searchTerm = RegExp(term, 'gi');  // match anywhere in string & case-insensitive
+  if (typeof searchSpace === 'string') {
+    return searchSpace.match(searchTerm)?.length ?? 0;
+  } else {
+    return searchSpace.map(value => value.match(searchTerm)?.length ?? 0).reduce((prev, curr) => prev + curr);
+  }
 }
