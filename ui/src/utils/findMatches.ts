@@ -7,7 +7,6 @@ import {
   isPunkAPIErrorJSON
 } from './types';
 
-
 /**
  * Gets an array of beer objects based on a fuzzy search including the passed terms, with a heuristic applied
  * 
@@ -57,23 +56,18 @@ export async function findMatches(styles: string[], flavors: string[], abv: numb
 }
 
 
-
-
 /**
  * Applies a heuristic to score matches from 1 to 100 weighted 20% for matching style and 80% for matching flavors
  * 
  * @return PairingJSON objects sorted in decreasing order and summary data for search term matches found
  */
 function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, BeerJSON>): MatchData {
-  let maxMatchingFlavors = 0;                             // to adjust weights
   const beerInfo = new Map<number, [boolean, number]>();  // beerID -> matched style, num matching flavors
   const styleSummary = new Map<string, number>();         // style -> num matching beers
   const flavorSummary = new Map<string, number>();        // flavors -> num matching beers
   const pairings: PairingJSON[] = [];
 
-  /**
-   * First Pass: Determine and store the number of matching styles and flavors, respectively
-   */
+  //first pass: determine and store the number of matching styles and flavors, respectively
   beers.forEach((beer) => {
     const pairing: PairingJSON = { ...beer, matchingTerms: {}, matchScore: 0 };
     beerInfo.set(beer.id, [false, 0]);
@@ -100,48 +94,12 @@ function applyHeuristic(styles: string[], flavors: string[], beers: Map<number, 
       }
     });
 
-    maxMatchingFlavors = Math.max(maxMatchingFlavors, numMatchingFlavors);
     beerInfo.set(beer.id, [matchedStyle, numMatchingFlavors])
     pairings.push(pairing);
   });
 
-
-  /**
-   * Second pass: determine the match score for each beer
-   */
-
   // second pass: determine the match score for each beer
-  pairings.forEach((pairing) => {
-    // we should never actually fail to retrieve by id, but we should have default values here for safety
-    const [matchedStyle, numFlavorMatches] = beerInfo.get(pairing.id) ?? [false, 0];
-    pairing.matchScore += matchedStyle ? 20 : 1;  // 20 points for a style match; 1 point min for the scale
-    
-    /**
-     * The flavor portion of the match score needs fine tuning. For now, it's calculated like so:
-     *   - max num of matches <= 1 (yikes) gets 50 points for a match and 0 for no match
-     *   - anything above that, scales (stretched up to 5) between 50 and 80 for >= 1 match, and 0 for no match
-     */
-    if (numFlavorMatches > 0) {
-      let scale;
-      switch (maxMatchingFlavors) {
-      case 2:
-        scale = 25;
-        break;
-      case 3:
-        scale = 10;
-        break;
-      // case 4:
-      //   scale = 10;
-      //   break;
-      default:
-        scale = 7;
-        pairing.matchScore += 2; // otherwise the spread is 28 instead of 30
-        break;
-      }
-      // if we get here, there's at least one match, so add 50 first, then multiply the scale by the balance
-      pairing.matchScore += 50 + scale * Math.min(4, (numFlavorMatches - 1));
-    }
-  });
+  calculateMatchScore(beerInfo, pairings);
 
   // sort the pairings in descending order by match score & get the summary data in the right format
   return { 
@@ -171,4 +129,19 @@ function findNumMatches(term: string, searchSpace: string | string[]): number {
   } else {
     return searchSpace.map(value => value.match(searchTerm)?.length ?? 0).reduce((prev, curr) => prev + curr);
   }
+}
+
+
+/**
+ * Calculates the match score of each pairing. Scores are determined based on the value in beerInfo and written
+ * to each pairing in place (pairing.matchScore)
+ */
+function calculateMatchScore(beerInfo: Map<number, [boolean, number]>, pairings: PairingJSON[]): void {
+  pairings.forEach((pairing) => {
+    const [matchedStyle, numFlavorMatches] = beerInfo.get(pairing.id) ?? [false, 0];
+    // style match score: 20% weight
+    pairing.matchScore += matchedStyle ? 20 : 1;
+    // flavor match score portion: 80% weight (32 points for 1 match, 12 points for each additional up to 4)
+    pairing.matchScore += numFlavorMatches > 0 ? 32 + Math.min(numFlavorMatches - 1, 4) * 12 : 0;
+  });
 }

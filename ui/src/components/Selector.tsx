@@ -44,7 +44,7 @@ export function Selector(props: SelectorProps): JSX.Element {
         value={selectedOptions}
         onChange={(event, value) => setSelectedOptions(value)}
 
-        // render the input field as text input; MUI's documentation suggests this function signature
+        // render the input field as text input; MUI's documentation suggests using this specific function signature
         renderInput={(props) => (
           <TextField
             variant="outlined"

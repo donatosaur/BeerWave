@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Typography, Link } from '@mui/material';
+import { AppBar, Box, Typography, Link } from '@mui/material';
 import { defaultSxProps } from '../../themes';
 
 /**

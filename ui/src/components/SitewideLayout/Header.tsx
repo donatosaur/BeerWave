@@ -1,5 +1,4 @@
-import { Link as ReactRouterLink } from 'react-router-dom';
-import { AppBar, Box, Container, Typography, Link } from '@mui/material';
+import { AppBar, Box, Typography } from '@mui/material';
 
 /**
  * Site-wide header included in app layout
