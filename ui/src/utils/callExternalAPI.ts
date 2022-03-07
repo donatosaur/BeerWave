@@ -72,7 +72,7 @@ export async function getByFuzzySearch(styles: string[], flavors: string[], abv:
  */
 export async function getPiePlot(title: string, values: PlotValues[]): Promise<Blob> {
 
-  const plotRequest: PlotJSON = { title, x_label: '', y_label: '', type: 'bar', values }
+  const plotRequest: PlotJSON = { title, x_label: '', y_label: '', type: 'pie', values }
   const response = await fetch(PLOT_API_URL, {
     method: 'POST',
     headers: {
