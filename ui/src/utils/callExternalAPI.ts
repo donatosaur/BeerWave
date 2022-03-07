@@ -64,24 +64,15 @@ export async function getByFuzzySearch(styles: string[], flavors: string[], abv:
 
 
 /**
- * Gets an chart image (as a Blob) from the Plot API Microservice
+ * Gets a pie chart image (as a Blob) from the Plot API Microservice
  * 
  * @param title a title for the chart
- * @param type 'bar' for a bar chart, 'pie' for a pie chart
  * @param values an array of objects containing label-value pair objects
- * @param x_label a label for the x-axis (for type 'bar')
- * @param y_label a label for the y-axis (for type 'bar')
  * 
  */
-export async function getPlot(
-  title: string,
-  type: 'bar' | 'pie',
-  values: PlotValues[],
-  x_label: string = '',
-  y_label: string = '',
-): Promise<Blob> {
+export async function getPiePlot(title: string, values: PlotValues[]): Promise<Blob> {
 
-  const plotRequest: PlotJSON = { title, x_label, y_label, type, values }
+  const plotRequest: PlotJSON = { title, x_label: '', y_label: '', type: 'bar', values }
   const response = await fetch(PLOT_API_URL, {
     method: 'POST',
     headers: {
@@ -93,7 +84,7 @@ export async function getPlot(
 
   // parse and verify that we received an image
   if (!response.ok || !response.headers?.get('Content-Type')?.startsWith('image/')) {
-    return Promise.reject(new Error('getPlot() fetch call failed'));
+    return Promise.reject(new Error('getPiePlot() fetch call failed'));
   }
 
   return response.blob();

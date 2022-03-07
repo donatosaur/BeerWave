@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CardMedia } from '@mui/material';
-import { getPlot, type PlotValues } from '../utils';
+import { getPiePlot, type PlotValues } from '../utils';
 
 
 interface ChartProps {
@@ -22,7 +22,7 @@ export function ChartImageCardMedia({ title, values, height, width }: ChartProps
     
     void (async () => {
       try {
-        const imageBlob = await getPlot(title, 'pie', values);
+        const imageBlob = await getPiePlot(title, values);
         setImageURL(URL.createObjectURL(imageBlob));
       } catch (error) {
         console.error(`Something went wrong: ${error}`);
