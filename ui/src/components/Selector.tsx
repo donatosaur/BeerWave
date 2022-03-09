@@ -1,7 +1,7 @@
 import type { Dispatch } from 'react';
 import { Autocomplete, TextField } from '@mui/material';
 
-interface SelectorProps {
+export interface SelectorProps {
   id: string;
   floatingLabel: string;
   placeholder: string;
@@ -31,16 +31,13 @@ export function Selector(props: SelectorProps): JSX.Element {
       <Autocomplete
         id={id}
         options={options}
-
-        multiple                    // allow multiple selections
-        autoComplete                // allow autocomplete while typing
+        multiple
+        autoComplete
         filterSelectedOptions       // hide already-selected options
         getOptionDisabled = {       // prevent additional selections when the max number has been chosen
           () => selectedOptions.length >= maxSelections
         }
-        disableClearable             // the default location (next to the dropdown button) is a recipe for disaster
-
-        // store the selected options
+        disableClearable
         value={selectedOptions}
         onChange={(event, value) => setSelectedOptions(value)}
 
@@ -50,7 +47,7 @@ export function Selector(props: SelectorProps): JSX.Element {
             variant="outlined"
             label={floatingLabel}
             placeholder={placeholder}
-            {...props}                 // pass any additional props from autocomplete down to the input field
+            {...props}
           />
         )}
       />

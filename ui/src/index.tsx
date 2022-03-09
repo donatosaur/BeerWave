@@ -14,5 +14,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-// reportWebVitals(console.log);  // see https://bit.ly/CRA-vitals

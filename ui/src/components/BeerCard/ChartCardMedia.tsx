@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CardMedia } from '@mui/material';
-import { getPiePlot, type PlotValues } from '../utils';
+import { getPiePlot, type PlotValues } from '@utils';
 
 
 interface ChartProps {
@@ -12,9 +12,9 @@ interface ChartProps {
 
 
 /**
- * A CardMedia that gets and displays a chart from the Plot API Microservice 
+ * CardMedia component that gets and displays a chart from the Plot API Microservice 
  */
-export function ChartImageCardMedia({ title, values, height, width }: ChartProps): JSX.Element {
+export default function ChartCardMedia({ title, values, height, width }: ChartProps): JSX.Element {
   const [imageURL, setImageURL] = useState<string>();
   
   useEffect(() => {
@@ -36,7 +36,7 @@ export function ChartImageCardMedia({ title, values, height, width }: ChartProps
       }
       abortController.abort();
     }
-  }, [ values ]);
+  });
 
   return (
     <CardMedia
