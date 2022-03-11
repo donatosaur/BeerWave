@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CardMedia } from '@mui/material';
-import { getPiePlot, type PlotValues } from '@utils';
+import { getPiePlot, type PlotValues } from 'src/utils';
 
 
 interface ChartProps {

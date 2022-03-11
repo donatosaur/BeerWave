@@ -1,7 +1,7 @@
-import { useState, type Dispatch } from 'react';
+import type { PairingJSON, PlotValues } from 'src/utils';
+import { useState } from 'react';
 import { Card } from '@mui/material';
-import type { PairingJSON, PlotValues } from '@utils';
-import { type CardNavigationProps, CardNavigation } from '@components';
+import { CardNavigation, type CardNavigationProps } from 'src/components';
 
 import BeerCardHeader from './BeerCardHeader';
 import BeerCardBody from './BeerCardBody';
@@ -9,8 +9,8 @@ import ChartDialog from './ChartDialog';
 import BeerCardActionsPanel from './BeerCardActionsPanel';
 
 export interface BeerCardProps extends CardNavigationProps {
+  buttons: Array<JSX.Element>;
   beer: PairingJSON;
-  setStartOverDialogOpen: Dispatch<boolean>;
   flavorData: PlotValues[];
 }
 
@@ -21,20 +21,19 @@ export function BeerCard(props: BeerCardProps): JSX.Element {
   const [chartOpen, setChartOpen] = useState(false);
   
   const {
+    buttons,
     beer,
     backButtonDisabled,
     nextButtonDisabled,
     onBackButtonClick,
     onNextButtonClick,
-    setStartOverDialogOpen,
     flavorData,
   } = props;
-
 
   return (
     <Card sx={{maxWidth: 600}}>
       <BeerCardHeader 
-        setStartOverDialogOpen={setStartOverDialogOpen}
+        buttons={buttons}
         beerName={beer.name}
         tagline={beer.tagline}
         abv={beer.abv}

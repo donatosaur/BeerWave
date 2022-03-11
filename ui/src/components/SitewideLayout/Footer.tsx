@@ -1,5 +1,5 @@
 import { AppBar, Box, Typography, Link } from '@mui/material';
-import { defaultSxProps } from '../../themes';
+import { defaultSxProps } from 'src/theme';
 
 /**
  * Site-wide footer included in app layout

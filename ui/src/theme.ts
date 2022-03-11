@@ -30,7 +30,7 @@ export const siteTheme: Theme = createTheme({
 });
 
 
-// declare default sx props for MUI elements ...
+// Default sx props for MUI elements
 
 const container: SxProps = {
   p: 1,
@@ -46,8 +46,6 @@ const bordered: SxProps = {
   boxShadow: 5,
 }
 
-
-
 const footer: SxProps = {
   top: 'auto',  // anchor to bottom of flexbox
   bottom: 0,
@@ -56,10 +54,28 @@ const footer: SxProps = {
 }
 
 
-// ... and make them efficiently accessible
+const stepTypography: SxProps = { 
+  my: 2,
+  mx: 0.5,
+}
+
+const stepStack: SxProps = {
+  m: 1,
+  p: 1,
+}
+
+const selectorBox: SxProps = {
+  mt: 3,
+  mb: 2,
+}
+
+
 export const defaultSxProps = new Map<string, SxProps>([
   ['container', container],
   ['bordered', bordered],
   ['box', box],
   ['footer', footer],
+  ['stepTypography', stepTypography],
+  ['stepStack', stepStack],
+  ['selectorBox', selectorBox],
 ]);

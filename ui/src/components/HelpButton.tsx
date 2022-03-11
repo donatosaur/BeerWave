@@ -1,4 +1,4 @@
-import { useState, type Dispatch } from 'react';
+import { useState } from 'react';
 import { Box, Button, Popover, Typography } from '@mui/material';
 import { Help } from '@mui/icons-material';
 
@@ -14,8 +14,9 @@ interface HelpButtonProps {
 /**
  * A toggle-able help button that renders a popover with the specified help text.
  */
-export function HelpButton({verticalAnchor, horizontalAnchor, helpText}: HelpButtonProps): JSX.Element {
-  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);  // anchor element to position popover
+export function HelpButton(props: HelpButtonProps): JSX.Element {
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);  // to position popover
+  const { verticalAnchor, horizontalAnchor, helpText } = props;
 
   return (
     <>
@@ -33,11 +34,10 @@ export function HelpButton({verticalAnchor, horizontalAnchor, helpText}: HelpBut
         anchorOrigin={{vertical: verticalAnchor, horizontal: horizontalAnchor}}
         onClose={() => setAnchor(null)}
       >
-        {/* using index here as key as a shortcut: these elements won't change over the lifetime of the component */}
         <Box sx={{maxWidth: 400, height: 'auto', p: 1}}>
           {
             helpText.map((text, index) => (
-              <Typography key={index} paragraph align="left" variant="caption">
+              <Typography key={`help-text-${index}`} paragraph align="left" variant="caption">
                 { text }
               </Typography>
             ))

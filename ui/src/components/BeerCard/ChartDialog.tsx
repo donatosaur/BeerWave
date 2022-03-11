@@ -1,5 +1,5 @@
 import type { Dispatch } from 'react';
-import type { PlotValues } from '@utils';
+import type { PlotValues } from 'src/utils';
 import {
   Button,
   Card,

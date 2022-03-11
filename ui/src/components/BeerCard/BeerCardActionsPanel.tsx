@@ -1,7 +1,7 @@
 import type { Dispatch } from 'react';
 import { Button, CardActions } from '@mui/material';
 import { NorthEast } from '@mui/icons-material';
-import { TwitterShareButton } from '@components';
+import { TwitterShareButton } from 'src/components';
 
 interface ActionsPanelProps {
   setChartOpen: Dispatch<boolean>;

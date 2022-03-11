@@ -1,10 +1,9 @@
-import type { Dispatch } from 'react';
-import { Box, Button, CardHeader, CardActions } from '@mui/material';
-import { HelpButton } from '@components';
+import { Box, CardHeader, CardActions } from '@mui/material';
+import { HelpButton } from 'src/components';
 
 
 interface BeerCardHeaderProps {
-  setStartOverDialogOpen: Dispatch<boolean>;
+  buttons: Array<JSX.Element>;
   beerName: string;
   tagline: string;
   abv: string | number;
@@ -23,11 +22,11 @@ const helpText = [
 
 
 /**
- * CardHeader with a CardActions panel containing a start over button and a help button
+ * CardHeader with a CardActions panel containing any passed buttons and a right-anchored help button
  */
 export default function BeerCardHeader(props: BeerCardHeaderProps): JSX.Element {
   const {
-    setStartOverDialogOpen,
+    buttons,
     beerName,
     tagline,
     abv,
@@ -38,12 +37,7 @@ export default function BeerCardHeader(props: BeerCardHeaderProps): JSX.Element 
     <>
       <CardActions sx={{flex: 1, justifyContent: 'flex-end'}}>
         <Box sx={{ flexGrow: 1, flexShrink: 1 }}>
-          <Button
-            variant="contained"
-            onClick={() => setStartOverDialogOpen(true)}
-          >
-            Start Over
-          </Button>
+          { buttons }
         </Box>
         <Box>
           <HelpButton 
