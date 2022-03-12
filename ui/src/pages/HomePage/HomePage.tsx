@@ -2,6 +2,7 @@ import type { searchTermsObject } from './types';
 import { useState, useEffect } from 'react';
 import { Box, Container } from '@mui/material';
 import { defaultSxProps } from 'src/theme';
+import { ErrorAlert } from 'src/components';
 import { findMatches, type PairingJSON, type PlotValues } from 'src/utils';
 
 import { StepsPanel } from './StepsPanel';
@@ -15,6 +16,7 @@ export function HomePage(): JSX.Element {
   const [results, setResults] = useState<PairingJSON[]>([]);
   const [styleData, setStyleData] = useState<PlotValues[]>([]);
   const [flavorData, setFlavorData] = useState<PlotValues[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchTerms === null) {
@@ -29,15 +31,17 @@ export function HomePage(): JSX.Element {
         setStyleData(results.styleSummaryData);
         setFlavorData(results.flavorSummaryData);
       } catch (error) {
-        console.error(`Something went wrong: ${error}`);
+        setErrorMessage(`Something went wrong: ${error}`);
       }
     })();
-    return () => abortController.abort();  // cleanup function to abort any outstanding async requests on unmount
+    return () => abortController.abort();  // abort outstanding requests on unmount
   }, [searchTerms]);
 
 
   return (
     <>
+      { errorMessage && <ErrorAlert errorMessage={errorMessage} onClose={() => setErrorMessage(null)} /> }
+
       { results.length === 0 && (
         <Box>
           <WelcomePanel />
