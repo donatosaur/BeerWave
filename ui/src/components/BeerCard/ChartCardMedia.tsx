@@ -21,15 +21,16 @@ export default function ChartCardMedia({ title, values, height, width }: ChartPr
   
   useEffect(() => {
     const abortController = new AbortController();
-    
-    void (async () => {
-      try {
-        const imageBlob = await getPiePlot(title, values);
-        setImageURL(URL.createObjectURL(imageBlob));
-      } catch (error) {
-        setErrorMessage(`Something went wrong: ${error}`);
-      }
-    })();
+    if (!imageURL) {
+      void (async () => {
+        try {
+          const imageBlob = await getPiePlot(title, values);
+          setImageURL(URL.createObjectURL(imageBlob));
+        } catch (error) {
+          setErrorMessage(`Something went wrong: ${error}`);
+        }
+      })();
+    }
     return () => {
       if (imageURL !== undefined) {
         // we need to destroy the image URL if it was created (see https://mzl.la/3J9Rn09)

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Popover, Typography } from '@mui/material';
+import { Box, Button, Popover } from '@mui/material';
 import { Help } from '@mui/icons-material';
 
 type vertical = 'bottom' | 'top' | 'center';

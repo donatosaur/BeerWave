@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, Divider, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Card, CardActions, List, ListItem, ListItemText } from '@mui/material';
 import { HelpButton } from 'src/components';
 
 export interface ButtonPanelProps {
