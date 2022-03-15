@@ -1,6 +1,5 @@
 import { CardHeader } from '@mui/material';
 
-
 interface BeerCardHeaderProps {
   beerName: string;
   tagline: string;
@@ -13,20 +12,15 @@ interface BeerCardHeaderProps {
  * CardHeader with summary information
  */
 export default function BeerCardHeader(props: BeerCardHeaderProps): JSX.Element {
-  const {
-    beerName,
-    tagline,
-    abv,
-    matchScore,
-  } = props;
+  const { beerName, tagline, abv, matchScore } = props;
   
   return (
-    <>   
+    <>
       <CardHeader 
         title={beerName}
         subheader={`${tagline} ${abv}% ABV`}
       />
-      <CardHeader 
+      <CardHeader
         gutterBottom
         subheader={`Match Score: ${matchScore}`}
       />

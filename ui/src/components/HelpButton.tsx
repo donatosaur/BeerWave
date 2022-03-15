@@ -8,7 +8,7 @@ type horizontal = 'left' | 'right' | 'center';
 interface HelpButtonProps {
   verticalAnchor: vertical;
   horizontalAnchor: horizontal;
-  helpText: string[];
+  helpTextElement: JSX.Element;
 }
 
 /**
@@ -16,7 +16,7 @@ interface HelpButtonProps {
  */
 export function HelpButton(props: HelpButtonProps): JSX.Element {
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);  // to position popover
-  const { verticalAnchor, horizontalAnchor, helpText } = props;
+  const { verticalAnchor, horizontalAnchor, helpTextElement } = props;
 
   return (
     <>
@@ -29,19 +29,14 @@ export function HelpButton(props: HelpButtonProps): JSX.Element {
         Help
       </Button>
       <Popover
+        sx={{mt: 0.5}}
         open={!!anchor}
         anchorEl={anchor}
         anchorOrigin={{vertical: verticalAnchor, horizontal: horizontalAnchor}}
         onClose={() => setAnchor(null)}
       >
-        <Box sx={{maxWidth: 400, height: 'auto', p: 1}}>
-          {
-            helpText.map((text, index) => (
-              <Typography key={`help-text-${index}`} paragraph align="left" variant="caption">
-                { text }
-              </Typography>
-            ))
-          }
+        <Box sx={{maxWidth: 425, height: 'auto', p: 1}}>
+          { helpTextElement }
         </Box>
       </Popover>
     </>

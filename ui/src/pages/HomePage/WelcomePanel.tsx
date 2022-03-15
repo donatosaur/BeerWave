@@ -1,6 +1,5 @@
 import { Container, Typography } from '@mui/material';
 
-
 export function WelcomePanel(): JSX.Element {
   return (
     <>

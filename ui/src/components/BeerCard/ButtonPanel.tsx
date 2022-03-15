@@ -1,20 +1,9 @@
-import { Box, Card, CardActions } from '@mui/material';
+import { Box, Card, CardActions, Divider, List, ListItem, ListItemText } from '@mui/material';
 import { HelpButton } from 'src/components';
 
 export interface ButtonPanelProps {
   buttons: Array<JSX.Element>;
 }
-
-const helpText = [
-  'Basic Features:',
-  'To navigate between recommendations, use the left and right arrows at the bottom of each.',
-  'To get new recommendations, click the \'Start Over\' button on the top left.',
-  '\v',
-  'Advanced Features:',
-  'To share your recommendations via twitter, click the share button. This will open a new page, ' +
-  ' but don\'t worry: your results won\'t go anywhere!',
-];
-
 
 /**
  * Card containing any passed buttons and a right-anchored help button
@@ -32,10 +21,56 @@ export default function ButtonPanel(props: ButtonPanelProps): JSX.Element {
           <HelpButton 
             verticalAnchor="bottom"
             horizontalAnchor="left"
-            helpText={helpText}
+            helpTextElement={<HelpText />}
           />
         </Box>
       </CardActions>
     </Card>
   );
 }
+
+
+const HelpText = (): JSX.Element => (
+  <List dense>
+    <MatchScoreHelpItem />
+    <BasicFeaturesHelpItem />
+    <AdvancedFeaturesHelpItem />
+  </List>
+);
+
+const MatchScoreHelpItem = (): JSX.Element => (
+  <ListItem>
+    <ListItemText
+      primary="Match Score"
+      secondary="A score above 50 is a good match."
+    />
+  </ListItem>
+);
+
+const BasicFeaturesHelpItem = (): JSX.Element => (
+  <>
+    <ListItem>
+      <ListItemText
+        primary="Navigation"
+        secondary="To navigate between recommendations, use the left and right arrows at the
+                  bottom of each."
+      />
+    </ListItem>
+    <ListItem>
+      <ListItemText
+        primary="Start Over"
+        secondary="To get new recommendations, click the 'Start Over' button on the top left."
+      />
+    </ListItem>
+  </>
+);
+
+const AdvancedFeaturesHelpItem = (): JSX.Element => (
+  <ListItem>
+    <ListItemText
+      primary="Share (Advanced Feature)"
+      secondary="To share your recommendations via twitter, click the share button. This will open
+                 a new page, but don't worry: your results won't go anywhere!"
+    />
+  </ListItem>
+);
