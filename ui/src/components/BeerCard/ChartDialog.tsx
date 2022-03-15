@@ -20,7 +20,9 @@ interface ChartDialogProps {
 /**
  * Modal containing a pie chart representing the passed data
  */
-export default function ChartDialog({ data, chartOpen, setChartOpen }: ChartDialogProps): JSX.Element {
+export default function ChartDialog(props: ChartDialogProps): JSX.Element {
+  const { data, chartOpen, setChartOpen } = props;
+  
   return (
     <Dialog maxWidth="md" open={chartOpen} onClose={() => setChartOpen(false)}>
       <DialogTitle>Summary</DialogTitle>

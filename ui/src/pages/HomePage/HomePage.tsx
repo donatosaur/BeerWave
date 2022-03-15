@@ -14,7 +14,6 @@ import { WelcomePanel } from './WelcomePanel';
 export function HomePage(): JSX.Element {
   const [searchTerms, setSearchTerms] = useState<searchTermsObject | null>(null);
   const [results, setResults] = useState<PairingJSON[]>([]);
-  const [styleData, setStyleData] = useState<PlotValues[]>([]);
   const [flavorData, setFlavorData] = useState<PlotValues[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -28,7 +27,6 @@ export function HomePage(): JSX.Element {
         const {styles, flavors, abvLimit} = searchTerms;
         const results = await findMatches(styles, flavors, abvLimit);
         setResults(results.pairings);
-        setStyleData(results.styleSummaryData);
         setFlavorData(results.flavorSummaryData);
       } catch (error) {
         setErrorMessage(`Something went wrong: ${error}`);
@@ -40,7 +38,9 @@ export function HomePage(): JSX.Element {
 
   return (
     <>
-      { errorMessage && <ErrorAlert errorMessage={errorMessage} onClose={() => setErrorMessage(null)} /> }
+      { errorMessage && (
+        <ErrorAlert errorMessage={errorMessage} onClose={() => setErrorMessage(null)} />
+      )}
 
       { results.length === 0 && (
         <Box>
@@ -56,7 +56,6 @@ export function HomePage(): JSX.Element {
         <Box>
           <ResultsPanel
             results={results}
-            styleData={styleData}
             flavorData={flavorData}
             reset={() => {setSearchTerms(null); setResults([])}}
           />

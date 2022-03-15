@@ -1,6 +1,7 @@
 import { AppBar, Box, Typography, Link } from '@mui/material';
 import { defaultSxProps } from 'src/theme';
 
+
 /**
  * Site-wide footer included in app layout
  */
@@ -12,7 +13,7 @@ export default function Footer(): JSX.Element {
         color="secondary"
         sx={{
           ...defaultSxProps.get('footer'),
-          backgroundColor: (theme) => theme.palette.grey[300]
+          backgroundColor: (theme) => theme.palette.grey[300],
         }}
       >
         <Typography variant="caption">
@@ -24,7 +25,6 @@ export default function Footer(): JSX.Element {
           provided by <Link href="https://www.brewdog.com/uk/diy-dog">BrewDog&rsquo;s DIY Dog project</Link>.
         </Typography>
       </AppBar>
-
     </Box>
   );
 }

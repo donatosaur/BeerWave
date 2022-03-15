@@ -11,9 +11,10 @@ interface ActionsPanelProps {
 /**
  * CardActions panel with a twitter share button and a button that opens a pie chart modal
  */
-export default function BeerCardActionsPanel({ beerName, setChartOpen }: ActionsPanelProps): JSX.Element {
+export default function BeerCardActionsPanel(props: ActionsPanelProps): JSX.Element {
+  const { beerName, setChartOpen } = props;
   const message = `BeerWave just recommended this awesome beer to me: BrewDog's ${beerName}`;
-  
+
   return (
     <CardActions sx={{flex: 1, justifyContent: 'flex-end'}}>
       <Button

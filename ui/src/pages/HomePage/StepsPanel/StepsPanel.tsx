@@ -22,16 +22,20 @@ interface StepPanelProps {
 export function StepsPanel({ setSearchTerms }: StepPanelProps): JSX.Element {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedFlavors, setSelectedFlavors] = useState<string[]>([]);
-  const [abvLimit, setAbvLimit] = useState(0);
+  const [abvLimit, setAbvLimit] = useState('0');
 
   // closures
   const resetState = (): void => {
     setSelectedStyles([]);
     setSelectedFlavors([]);
-    setAbvLimit(0);
+    setAbvLimit('0');
   }
   const onComplete = (): void => {
-    setSearchTerms({ styles: selectedStyles, flavors: getFlavorSearchTerms(selectedFlavors), abvLimit });
+    setSearchTerms({
+      styles: selectedStyles,
+      flavors: getFlavorSearchTerms(selectedFlavors),
+      abvLimit: Number.parseFloat(abvLimit),
+    });
   }
 
 

@@ -63,6 +63,7 @@ export interface PlotJSON {
   values: PlotValues[];
 }
 
+/** Represents match data returned by the heuristic function */
 export interface MatchData {
   styleSummaryData: PlotValues[];
   flavorSummaryData: PlotValues[];

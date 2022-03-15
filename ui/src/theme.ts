@@ -59,10 +59,6 @@ const stepTypography: SxProps = {
   mx: 0.5,
 }
 
-const stepStack: SxProps = {
-  m: 1,
-  p: 1,
-}
 
 const selectorBox: SxProps = {
   mt: 3,
@@ -76,6 +72,5 @@ export const defaultSxProps = new Map<string, SxProps>([
   ['box', box],
   ['footer', footer],
   ['stepTypography', stepTypography],
-  ['stepStack', stepStack],
   ['selectorBox', selectorBox],
 ]);

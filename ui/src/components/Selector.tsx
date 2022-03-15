@@ -12,8 +12,8 @@ export interface SelectorProps {
 }
 
 /**
- * An autocomplete-enabled selector component that allows up to the specified number of components to be
- * selected, either by typing or by using a dropdown.
+ * An autocomplete-enabled selector component that allows up to the specified number of components
+ * to be selected, either by typing or by using a dropdown
  */
 export function Selector(props: SelectorProps): JSX.Element {
   const {
@@ -34,14 +34,14 @@ export function Selector(props: SelectorProps): JSX.Element {
         multiple
         autoComplete
         filterSelectedOptions       // hide already-selected options
-        getOptionDisabled = {       // prevent additional selections when the max number has been chosen
+        getOptionDisabled = {       // prevent additional selections when the max has been chosen
           () => selectedOptions.length >= maxSelections
         }
         disableClearable
         value={selectedOptions}
         onChange={(event, value) => setSelectedOptions(value)}
 
-        // render the input field as text input; MUI's documentation suggests using this specific function signature
+        // render the input field as text input; MUI's documentation suggests this signature
         renderInput={(props) => (
           <TextField
             variant="outlined"

@@ -41,7 +41,10 @@ export default function ChartCardMedia({ title, values, height, width }: ChartPr
 
   return (
     <>
-      { errorMessage && <ErrorAlert errorMessage={errorMessage} onClose={() => setErrorMessage(null)} /> }
+      { errorMessage && (
+        <ErrorAlert errorMessage={errorMessage} onClose={() => setErrorMessage(null)} />
+      )}
+      
       <CardMedia
         component="img"
         width={width}

@@ -8,10 +8,10 @@ export function WelcomePanel(): JSX.Element {
         <Typography variant="h3" align="center">
           Welcome to BeerWave!
         </Typography>
-        <Container sx={{maxWidth: 660}}>
+        <Container sx={{mt: 1, maxWidth: 600}}>
           <Typography variant="subtitle1" align="center" sx={{pb: 3}}>
-            Enter what styles of beer you prefer and some food flavors, and we&rsquo;ll try to pair your food with a
-            BrewDog beer. 
+            Enter your preferred beer styles and some food flavors, and we&rsquo;ll pair
+            your food with a BrewDog beer. 
           </Typography>
         </Container>
       </Container>

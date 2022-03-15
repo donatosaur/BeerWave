@@ -15,8 +15,7 @@ export default function Header(): JSX.Element {
           zIndex: (theme) => theme.zIndex.drawer + 50
         }}
       >
-        <Typography>BeerWave: a beer and food pairer</Typography>
-          
+        <Typography>BeerWave: a beer recipe and food pairer</Typography>
       </AppBar>
     </Box>
   );

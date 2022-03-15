@@ -14,7 +14,6 @@ export function SitewideLayout(): JSX.Element {
         <Header />
         <Outlet />
       </Box>
-      {/* placing the footer outside the flexbox will prevent it from being covered by other components */}
       <Footer />
     </>
   );
