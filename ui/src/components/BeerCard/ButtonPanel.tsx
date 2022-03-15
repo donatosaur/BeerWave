@@ -33,7 +33,9 @@ export default function ButtonPanel(props: ButtonPanelProps): JSX.Element {
 const HelpText = (): JSX.Element => (
   <List dense>
     <MatchScoreHelpItem />
-    <BasicFeaturesHelpItem />
+    <NavigationHelpItem />
+    <StartOverHelpItem />
+    <SeeSummaryHelpItem />
     <AdvancedFeaturesHelpItem />
   </List>
 );
@@ -47,23 +49,35 @@ const MatchScoreHelpItem = (): JSX.Element => (
   </ListItem>
 );
 
-const BasicFeaturesHelpItem = (): JSX.Element => (
-  <>
-    <ListItem>
-      <ListItemText
-        primary="Navigation"
-        secondary="To navigate between recommendations, use the left and right arrows at the
-                  bottom of each."
-      />
-    </ListItem>
-    <ListItem>
-      <ListItemText
-        primary="Start Over"
-        secondary="To get new recommendations, click the 'Start Over' button on the top left."
-      />
-    </ListItem>
-  </>
+const NavigationHelpItem = (): JSX.Element => (
+  <ListItem>
+    <ListItemText
+      primary="Navigation"
+      secondary="To navigate between recommendations, use the left and right arrows at the
+                bottom of each."
+    />
+  </ListItem>
 );
+
+const StartOverHelpItem = (): JSX.Element => (
+  <ListItem>
+    <ListItemText
+      primary="Start Over"
+      secondary="To get new recommendations, click the 'Start Over' button on the top left."
+    />
+  </ListItem>
+);
+
+const SeeSummaryHelpItem = (): JSX.Element => (
+  <ListItem>
+    <ListItemText
+      primary="See Summary of Matches"
+      secondary="To view the distribution of search terms in your results, press 'See Summary of
+                 Matches'"
+    />
+  </ListItem>
+);
+
 
 const AdvancedFeaturesHelpItem = (): JSX.Element => (
   <ListItem>
